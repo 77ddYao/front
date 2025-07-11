@@ -117,11 +117,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>我的账户</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = "/dashboard/profile"}>
                 <User className="mr-2 h-4 w-4" />
                 个人资料
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = "/dashboard/settings"}>
                 <Settings className="mr-2 h-4 w-4" />
                 设置
               </DropdownMenuItem>

@@ -27,23 +27,26 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-        const res = await loginAPI(credentials);
-        if (res.code === "200") {
-          console.log("登录成功", res.code, res.data);
-        } else {
-          alert(res.message || "登录失败");
-        }
-      } catch (err) {
-        alert("请求异常");
-      } finally {
-        setIsLoading(false);
-    }
+    const res = await loginAPI(credentials);
+    if (res.code === "200") {
+      // 1. 确保 token 和 user 信息同步存储
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("user", JSON.stringify({ 
+        username: credentials.username, 
+        role: credentials.role 
+      }));
 
-    // Simulate authentication
-    setTimeout(() => {
-      setIsLoading(false)
-      router.push("/dashboard")
-    }, 1000)
+      // 2. 登录成功后跳转（无需 setTimeout）
+      console.log("登录成功", res.code, res.data);
+      router.push("/dashboard");
+    } else {
+      alert(res.message || "登录失败");
+    }
+    } catch (err) {
+      alert("请求异常：" + err);
+    } finally {
+      setIsLoading(false); // 确保加载状态关闭
+    }
   }
 
   return (
