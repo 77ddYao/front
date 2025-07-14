@@ -9,12 +9,12 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Play, Pause, SkipBack, SkipForward, Layers, Ship, Info } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { getMapData } from "@/api/mapApi"
 
 // Mock data for ships
 const mockShips = Array.from({ length: 50 }, (_, i) => ({
   id: `ship-${i}`,
   name: `Vessel ${i}`,
-  type: ["Cargo", "Tanker", "Passenger", "Fishing", "Other"][Math.floor(Math.random() * 5)],
   mmsi: Math.floor(Math.random() * 1000000000),
   position: {
     lat: 22 + Math.random() * 10,
@@ -22,8 +22,16 @@ const mockShips = Array.from({ length: 50 }, (_, i) => ({
   },
   speed: Math.floor(Math.random() * 30),
   course: Math.floor(Math.random() * 360),
-  destination: ["Hong Kong", "Shanghai", "Singapore", "Tokyo", "Busan"][Math.floor(Math.random() * 5)],
 }))
+
+type Ship = {
+  id: string
+  name: string
+  mmsi: number
+  position: { lat: number; lng: number }
+  speed: number
+  course: number
+}
 
 export default function MapPage() {
   const mapContainerRef = useRef<HTMLDivElement>(null)
@@ -38,18 +46,14 @@ export default function MapPage() {
     fishing: true,
     other: true,
   })
+  const [ships, setShips] = useState<Ship[]>([])
 
   // Simulate map initialization
   useEffect(() => {
     if (mapContainerRef.current) {
-      // In a real application, you would initialize your map library here
-      // For example: new mapboxgl.Map({ container: mapContainerRef.current, ... })
-
-      // For this demo, we'll just add a placeholder
       const mapContainer = mapContainerRef.current
       mapContainer.innerHTML = ""
 
-      // Create a mock map
       const mockMap = document.createElement("div")
       mockMap.className = "relative w-full h-full bg-blue-100 dark:bg-blue-950 rounded-lg"
       mockMap.innerHTML = `
@@ -61,8 +65,7 @@ export default function MapPage() {
         </div>
       `
 
-      // Add mock ships to the map
-      mockShips.forEach((ship, index) => {
+      ships.forEach((ship) => {
         const shipElement = document.createElement("div")
         shipElement.className = `absolute w-3 h-3 rounded-full bg-red-500 cursor-pointer transition-all duration-300 hover:scale-150`
         shipElement.style.left = `${(ship.position.lng - 113) * 10}%`
@@ -74,7 +77,27 @@ export default function MapPage() {
 
       mapContainer.appendChild(mockMap)
     }
-  }, [mapView, filters])
+  }, [ships, mapView, filters])
+
+  useEffect(() => {
+    async function fetchShips() {
+      try {
+        // 如果需要登录信息，可以从 localStorage 获取
+        const credentials = {
+          username: localStorage.getItem("username") || "",
+          password: localStorage.getItem("password") || "",
+        }
+        const res = await getMapData()
+        // 假设后端返回 { code: "200", data: [...] }
+        if (res.code === "200" && Array.isArray(res.data)) {
+          setShips(res.data)
+        }
+      } catch (err) {
+        setShips([])
+      }
+    }
+    fetchShips()
+  }, [])
 
   const togglePlayback = () => {
     setIsPlaying(!isPlaying)
@@ -228,14 +251,10 @@ export default function MapPage() {
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div className="text-muted-foreground">MMSI:</div>
                     <div>{selectedShip.mmsi}</div>
-                    <div className="text-muted-foreground">Type:</div>
-                    <div>{selectedShip.type}</div>
                     <div className="text-muted-foreground">Speed:</div>
                     <div>{selectedShip.speed} knots</div>
                     <div className="text-muted-foreground">Course:</div>
                     <div>{selectedShip.course}°</div>
-                    <div className="text-muted-foreground">Destination:</div>
-                    <div>{selectedShip.destination}</div>
                     <div className="text-muted-foreground">Position:</div>
                     <div>
                       {selectedShip.position.lat.toFixed(4)}, {selectedShip.position.lng.toFixed(4)}
