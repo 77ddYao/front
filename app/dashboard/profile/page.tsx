@@ -1,34 +1,46 @@
 "use client";
 
-import React, { useEffect, useState } from "react"
-import { userProfileAPI } from "@/api/userApi"
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { userProfileAPI } from "@/api/userApi";
 
 interface UserProfile {
-  id: string
-  username: string
-  email: string
-  password?: string | null
+  id: string;
+  username: string;
+  email: string;
+  password?: string | null;
 }
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
+    console.log(localStorage.getItem("token"));
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.alert("未登录，请先登录！");
+      router.replace("/login");
+      return;
+    }
     // 页面加载时自动获取用户信息
     const fetchProfile = async () => {
       try {
-        const res = await userProfileAPI(localStorage.getItem("token") || "")
-        if (res.code === "200" && res.data) {
-          setProfile(res.data)
+        const res = await userProfileAPI(token);
+        if (res.code === 200 && res.data) {
+          setProfile(res.data);
+        } else if (res.code === 401) {
+          window.alert("无效的登录状态，请重新登录！");
+          router.replace("/login");
         } else {
-          setProfile(null)
+          setProfile(null);
         }
       } catch {
-        setProfile(null)
+        setProfile(null);
       }
-    }
-    fetchProfile()
-  }, [])
+    };
+    fetchProfile();
+  }, [router]);
 
   return (
     <div className="max-w-xl mx-auto mt-10 bg-white dark:bg-slate-900 rounded-lg shadow p-8">
@@ -52,5 +64,5 @@ export default function ProfilePage() {
         <div>未登录或获取信息失败</div>
       )}
     </div>
-  )
+  );
 }

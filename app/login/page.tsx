@@ -28,7 +28,7 @@ export default function LoginPage() {
 
     try {
     const res = await loginAPI(credentials);
-    if (res.code === "200") {
+    if (res.code === 200) {
       // 1. 确保 token 和 user 信息同步存储
       localStorage.setItem("token", res.token);
       localStorage.setItem("user", JSON.stringify({ 
@@ -40,6 +40,7 @@ export default function LoginPage() {
       console.log("登录成功", res.code, res.data);
       router.push("/dashboard");
     } else {
+      console.log("登录失败", res.code, res.message);
       alert(res.message || "登录失败");
     }
     } catch (err) {
