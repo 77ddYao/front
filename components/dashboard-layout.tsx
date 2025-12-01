@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ModeToggle } from "@/components/mode-toggle"
 import { useToast } from "@/hooks/use-toast"
+import basePath from 'next/config';
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -51,7 +52,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       description: "You have been logged out successfully",
     })
     // In a real app, you would handle logout logic here
-    window.location.href = "/login"
+    window.location.href = `${process.env.NEXT_PUBLIC_BASE_PATH || ''}/login`
   }
 
   const navigation = [
@@ -117,11 +118,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>我的账户</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => window.location.href = "/dashboard/profile"}>
+              <DropdownMenuItem onClick={() => window.location.href = `${process.env.NEXT_PUBLIC_BASE_PATH || ''}/dashboard/profile`}>
                 <User className="mr-2 h-4 w-4" />
                 个人资料
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => window.location.href = "/dashboard/settings"}>
+              <DropdownMenuItem onClick={() => window.location.href = `${process.env.NEXT_PUBLIC_BASE_PATH || ''}/dashboard/settings`}>
                 <Settings className="mr-2 h-4 w-4" />
                 设置
               </DropdownMenuItem>

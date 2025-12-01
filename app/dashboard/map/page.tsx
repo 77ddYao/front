@@ -10,6 +10,9 @@ import { Label } from "@/components/ui/label"
 import { Play, Pause, SkipBack, SkipForward, Layers, Ship, Info } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { getMapData } from "@/api/mapApi"
+import AMapLoader from "@amap/amap-jsapi-loader"
+
+const AMAP_KEY = "2c2d7c99732a8cf2688ff0a58acedf0c"
 
 // Mock data for ships
 const mockShips = Array.from({ length: 50 }, (_, i) => ({
@@ -47,53 +50,72 @@ export default function MapPage() {
     other: true,
   })
   const [ships, setShips] = useState<Ship[]>([])
+  const markersRef = useRef<AMap.Marker[]>([]) // 存储地图标记
 
-  // Simulate map initialization
+  // Initialize map and render ships
   useEffect(() => {
     if (mapContainerRef.current) {
       const mapContainer = mapContainerRef.current
       mapContainer.innerHTML = ""
 
-      const mockMap = document.createElement("div")
-      mockMap.className = "relative w-full h-full bg-blue-100 dark:bg-blue-950 rounded-lg"
-      mockMap.innerHTML = `
-        <div class="absolute inset-0 flex items-center justify-center">
-          <div class="text-center">
-            <p class="text-lg font-medium text-muted-foreground">Interactive Map View</p>
-            <p class="text-sm text-muted-foreground">Map would be rendered here with Mapbox or similar</p>
-          </div>
-        </div>
-      `
+      const loadMap = async () => {
+        if (!mapContainerRef.current) return
 
-      ships.forEach((ship) => {
-        const shipElement = document.createElement("div")
-        shipElement.className = `absolute w-3 h-3 rounded-full bg-red-500 cursor-pointer transition-all duration-300 hover:scale-150`
-        shipElement.style.left = `${(ship.position.lng - 113) * 10}%`
-        shipElement.style.top = `${(ship.position.lat - 22) * 10}%`
-        shipElement.title = ship.name
-        shipElement.onclick = () => setSelectedShip(ship)
-        mockMap.appendChild(shipElement)
-      })
+        try {
+          const AMap = await AMapLoader.load({
+            key: AMAP_KEY,
+            version: "2.0",
+          })
 
-      mapContainer.appendChild(mockMap)
+          const map = new AMap.Map(mapContainer, {
+            zoom: 5,
+            center: [113, 22],
+          })
+
+          console.log("Ships to be added to the map:", ships) // 调试日志
+
+          // 添加船舶标记
+          markersRef.current.forEach((marker) => marker.setMap(null)) // 清除旧标记
+          markersRef.current = ships.map((ship) => {
+            const marker = new AMap.Marker({
+              position: [ship.position.lng, ship.position.lat],
+              title: ship.name,
+              content: `
+                <div style="font-size: 24px; line-height: 24px; text-align: center;">
+                  🚢
+                </div>
+              `,
+            })
+
+            marker.on("click", () => {
+              setSelectedShip(ship) // 设置当前选中的船舶
+              map.setCenter([ship.position.lng, ship.position.lat]) // 高亮并居中
+            })
+
+            marker.setMap(map)
+            return marker
+          })
+        } catch (e) {
+          console.error("Failed to load AMap:", e)
+        }
+      }
+
+      loadMap()
     }
   }, [ships, mapView, filters])
 
   useEffect(() => {
     async function fetchShips() {
       try {
-        // 如果需要登录信息，可以从 localStorage 获取
-        const credentials = {
-          username: localStorage.getItem("username") || "",
-          password: localStorage.getItem("password") || "",
-        }
         const res = await getMapData()
-        // 假设后端返回 { code: "200", data: [...] }
-        if (res.code === "200" && Array.isArray(res.data)) {
+        console.log("Fetched ships data:", res) // 调试日志
+        if (res.code === 200 && Array.isArray(res.data)) {
           setShips(res.data)
+        } else {
+          console.error("Invalid ships data format:", res)
         }
       } catch (err) {
-        setShips([])
+        console.error("Failed to fetch ships:", err)
       }
     }
     fetchShips()
