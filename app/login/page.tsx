@@ -95,6 +95,15 @@ export default function LoginPage() {
         </CardContent>
         <CardFooter className="flex flex-col space-y-2">
           <div className="text-sm text-center text-muted-foreground">Protected by advanced security protocols</div>
+          <div className="text-sm text-center">
+            还没有账号？
+            <a
+              href="/register"
+              className="text-blue-600 hover:underline dark:text-blue-400"
+            >
+              去注册
+            </a>
+          </div>
         </CardFooter>
       </Card>
     </div>

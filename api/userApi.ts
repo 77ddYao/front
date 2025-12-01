@@ -20,3 +20,17 @@ export async function userProfileAPI(token: string) {
   });
   return res.data;
 }
+
+export async function registerAPI(credentials: { username: string; password: string; avatar: File }) {
+  const formData = new FormData();
+  formData.append('username', credentials.username);
+  formData.append('password', credentials.password);
+  formData.append('avatar', credentials.avatar);
+
+  const res = await axios.post(`${API_BASE_URL}/api/users/register`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return res.data;
+}
