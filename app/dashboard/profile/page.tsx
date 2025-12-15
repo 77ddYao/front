@@ -21,7 +21,7 @@ export default function ProfilePage() {
     const token = localStorage.getItem("token");
     if (!token) {
       window.alert("未登录，请先登录！");
-      router.replace(`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/login`);
+      router.replace(`/login`);
       return;
     }
     // 页面加载时自动获取用户信息
@@ -32,7 +32,7 @@ export default function ProfilePage() {
           setProfile(res.data);
         } else if (res.code === 401) {
           window.alert("无效的登录状态，请重新登录！");
-          router.replace(`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/login`);
+          router.replace(`/login`);
         } else {
           setProfile(null);
         }

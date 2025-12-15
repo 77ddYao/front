@@ -10,7 +10,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
     if (!token) {
-      router.replace("/login")
+      console.log("No token found, redirecting to login")
+      router.replace(`/login`);
     }
   }, [router])
 

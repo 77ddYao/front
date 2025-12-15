@@ -52,7 +52,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       description: "You have been logged out successfully",
     })
     // In a real app, you would handle logout logic here
-    window.location.href = `${process.env.NEXT_PUBLIC_BASE_PATH || ''}/login`
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+    const normalizedBasePath = basePath.endsWith('/') ? basePath.slice(0, -1) : basePath;
+    window.location.href = `${normalizedBasePath}/login`
   }
 
   const navigation = [
@@ -61,8 +63,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     { name: "船只", href: "/dashboard/ships", icon: Ship },
     { name: "港口", href: "/dashboard/ports", icon: Anchor },
     { name: "分析", href: "/dashboard/analytics", icon: BarChart3 },
-    { name: "数据导入", href: "/dashboard/import", icon: FileUp },
-    { name: "数据库", href: "/dashboard/database", icon: Database },
+    // { name: "test", href: "/dashboard/import", icon: FileUp },
+    // { name: "数据库", href: "/dashboard/database", icon: Database },
   ]
 
   if (!isMounted) {

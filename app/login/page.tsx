@@ -4,7 +4,8 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Anchor, Ship } from "lucide-react"
+import { Anchor, Ship } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -97,12 +98,12 @@ export default function LoginPage() {
           <div className="text-sm text-center text-muted-foreground">Protected by advanced security protocols</div>
           <div className="text-sm text-center">
             还没有账号？
-            <a
+            <Link
               href="/register"
               className="text-blue-600 hover:underline dark:text-blue-400"
             >
               去注册
-            </a>
+            </Link>
           </div>
         </CardFooter>
       </Card>
