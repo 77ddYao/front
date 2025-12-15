@@ -1,4 +1,6 @@
-"use client"
+'use client';
+
+import dynamic from 'next/dynamic';
 
 import { useState, useEffect, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,6 +14,10 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { getMapData } from "@/api/mapApi"
 import AMapLoader from "@amap/amap-jsapi-loader"
 
+const MapClient = dynamic(() => import('@/components/MapClient'), {
+  ssr: false,
+});
+
 // Declare AMap types
 declare global {
   namespace AMap {
@@ -21,36 +27,36 @@ declare global {
       setFitView(overlays?: Array<any>): void
       setLayers(layers: Array<any>): void
     }
-    
+
     class Marker {
       constructor(options?: MarkerOptions)
       setMap(map: Map | null): void
       on(event: string, handler: Function): void
     }
-    
+
     class Polyline {
       constructor(options?: PolylineOptions)
       setMap(map: Map | null): void
       setPath(path: Array<[number, number]>): void
     }
-    
+
     class TileLayer {
       constructor()
       static Satellite(): any
       static RoadNet(): any
     }
-    
+
     interface MapOptions {
       zoom?: number
       center?: [number, number]
     }
-    
+
     interface MarkerOptions {
       position?: [number, number]
       title?: string
       content?: string
     }
-    
+
     interface PolylineOptions {
       path?: Array<[number, number]>
       strokeColor?: string
@@ -181,17 +187,17 @@ export default function MapPage() {
 
             // 创建新的轨迹线
             const path = trackData.map(point => [point.longitude, point.latitude]) as [number, number][]
-            
+
             polylineRef.current = new AMap.Polyline({
               path: path,
               strokeColor: "#3366FF",
               strokeWeight: 4,
               strokeOpacity: 0.8,
             })
-            
+
             if (polylineRef.current) {
               polylineRef.current.setMap(map)
-              
+
               // 调整地图视野以适应轨迹
               map.setFitView([polylineRef.current])
             }
@@ -234,25 +240,25 @@ export default function MapPage() {
       // 注意：浏览器安全策略不允许直接访问本地文件系统
       // 在实际应用中，你需要通过文件上传或服务器API来获取这些数据
       // 这里只是一个模拟示例
-      
+
       // 模拟从文件读取数据
       console.warn("Direct file system access is not available in browser environment.");
       console.log("In a real application, you would need to upload the file or access it through a server API.");
-      
+
       // 使用迈阿密地区的船舶轨迹数据示例
       const sampleData: TrackPoint[] = [
-        {"base_date_time":"2025-06-30T00:00:03.000+08:00","longitude":-80.18479,"latitude":25.77272,"sog":12.5,"status":0},
-        {"base_date_time":"2025-06-30T00:03:05.000+08:00","longitude":-80.18577,"latitude":25.77374,"sog":11.2,"status":0},
-        {"base_date_time":"2025-06-30T00:06:06.000+08:00","longitude":-80.18676,"latitude":25.77476,"sog":10.8,"status":0},
-        {"base_date_time":"2025-06-30T00:09:05.000+08:00","longitude":-80.18778,"latitude":25.77576,"sog":10.1,"status":0},
-        {"base_date_time":"2025-06-30T00:12:06.000+08:00","longitude":-80.18877,"latitude":25.77674,"sog":9.7,"status":0},
-        {"base_date_time":"2025-06-30T00:15:08.000+08:00","longitude":-80.18981,"latitude":25.77781,"sog":9.2,"status":0},
-        {"base_date_time":"2025-06-30T00:18:10.000+08:00","longitude":-80.19092,"latitude":25.77893,"sog":8.8,"status":0},
-        {"base_date_time":"2025-06-30T00:21:12.000+08:00","longitude":-80.19201,"latitude":25.78001,"sog":8.5,"status":0},
-        {"base_date_time":"2025-06-30T00:24:14.000+08:00","longitude":-80.19315,"latitude":25.78115,"sog":8.1,"status":0},
-        {"base_date_time":"2025-06-30T00:27:16.000+08:00","longitude":-80.19428,"latitude":25.78228,"sog":7.9,"status":0}
+        { "base_date_time": "2025-06-30T00:00:03.000+08:00", "longitude": -80.18479, "latitude": 25.77272, "sog": 12.5, "status": 0 },
+        { "base_date_time": "2025-06-30T00:03:05.000+08:00", "longitude": -80.18577, "latitude": 25.77374, "sog": 11.2, "status": 0 },
+        { "base_date_time": "2025-06-30T00:06:06.000+08:00", "longitude": -80.18676, "latitude": 25.77476, "sog": 10.8, "status": 0 },
+        { "base_date_time": "2025-06-30T00:09:05.000+08:00", "longitude": -80.18778, "latitude": 25.77576, "sog": 10.1, "status": 0 },
+        { "base_date_time": "2025-06-30T00:12:06.000+08:00", "longitude": -80.18877, "latitude": 25.77674, "sog": 9.7, "status": 0 },
+        { "base_date_time": "2025-06-30T00:15:08.000+08:00", "longitude": -80.18981, "latitude": 25.77781, "sog": 9.2, "status": 0 },
+        { "base_date_time": "2025-06-30T00:18:10.000+08:00", "longitude": -80.19092, "latitude": 25.77893, "sog": 8.8, "status": 0 },
+        { "base_date_time": "2025-06-30T00:21:12.000+08:00", "longitude": -80.19201, "latitude": 25.78001, "sog": 8.5, "status": 0 },
+        { "base_date_time": "2025-06-30T00:24:14.000+08:00", "longitude": -80.19315, "latitude": 25.78115, "sog": 8.1, "status": 0 },
+        { "base_date_time": "2025-06-30T00:27:16.000+08:00", "longitude": -80.19428, "latitude": 25.78228, "sog": 7.9, "status": 0 }
       ];
-      
+
       setTrackData(sampleData);
     } catch (error) {
       console.error("Error loading track data from file:", error);
@@ -313,7 +319,7 @@ export default function MapPage() {
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-                  
+
                   {/* 添加加载轨迹按钮 */}
                   <TooltipProvider>
                     <Tooltip>
@@ -333,7 +339,14 @@ export default function MapPage() {
           </CardHeader>
           <CardContent>
             <div className="relative">
-              <div ref={mapContainerRef} className="w-full h-[500px] rounded-lg overflow-hidden border"></div>
+              {/* <div ref={mapContainerRef} className="w-full h-[500px] rounded-lg overflow-hidden border"></div> */}
+              {/* 地图组件（客户端-only） */}
+              <MapClient
+                ships={ships}
+                trackData={trackData}
+                mapView={mapView}
+                onSelectShip={setSelectedShip}
+              />
 
               {/* Time control slider */}
               <div className="mt-4 space-y-2">
